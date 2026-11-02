@@ -28,7 +28,7 @@ Projeto Integrador Transdisciplinar em Sistemas de Informação II.
 | ORM | SQLAlchemy (Flask-SQLAlchemy) |
 | Front-end | HTML5 + Jinja2, CSS3, JavaScript puro |
 | Testes | pytest (31 testes automatizados) |
-| Hospedagem | PythonAnywhere (plano gratuito, com MySQL) |
+| Hospedagem | PythonAnywhere (plano gratuito; usa SQLite, pois o plano gratuito não inclui MySQL) |
 
 ## Estrutura MVC
 
@@ -89,20 +89,22 @@ O resultado da última execução está em `docs/evidencias/resultado_pytest.txt
 ## Publicar no PythonAnywhere (gratuito)
 
 1. Crie uma conta gratuita (Beginner) em https://www.pythonanywhere.com.
-2. Na aba **Databases**, crie uma senha do MySQL (clique em *Initialize MySQL*).
-3. Na aba **Consoles**, abra um **Bash** e cole:
+2. Na aba **Consoles**, abra um **Bash** e cole:
    ```bash
    git clone https://github.com/aanjelaa/agropedidos.git && bash agropedidos/pythonanywhere_setup.sh
    ```
-   O script pede a senha do MySQL, instala as bibliotecas e cria as tabelas com dados de exemplo.
-4. Na aba **Web**: *Add a new web app* → *Manual configuration* → *Python 3.10*.
-5. Abra o **WSGI configuration file**, apague tudo, cole as linhas abaixo e salve:
+   O script instala as bibliotecas e cria as tabelas com dados de exemplo. No plano gratuito o
+   PythonAnywhere não oferece MySQL, então o sistema usa SQLite (arquivo `agropedidos.db`), sem
+   nenhuma mudança no código. Em conta paga, crie o MySQL na aba *Databases* e rode o script com
+   `USAR_MYSQL=1 bash agropedidos/pythonanywhere_setup.sh`.
+3. Na aba **Web**: *Add a new web app* → *Manual configuration* → *Python 3.10*.
+4. Abra o **WSGI configuration file**, apague tudo, cole as linhas abaixo e salve:
    ```python
    import sys, os
    sys.path.insert(0, os.path.expanduser('~/agropedidos'))
    from wsgi_pythonanywhere import application
    ```
-6. Clique em **Reload**. O sistema fica em `https://SEU-USUARIO.pythonanywhere.com`.
+5. Clique em **Reload**. O sistema fica em `https://SEU-USUARIO.pythonanywhere.com`.
 
 Para atualizar depois de mudanças no GitHub: `cd ~/agropedidos && git pull` e **Reload** na aba Web.
 

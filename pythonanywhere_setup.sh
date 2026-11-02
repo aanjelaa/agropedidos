@@ -4,9 +4,13 @@
 set -e
 cd "$(dirname "$0")"
 PY=python3.10
+command -v $PY >/dev/null || PY=python3
+VERSAO=$($PY -c "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 
 echo "== AgroPedidos: instalação no PythonAnywhere (usuário: $USER) =="
-if [ ! -s ~/.agropedidos_senha ]; then
+# Plano gratuito do PythonAnywhere não tem MySQL: usa SQLite (arquivo agropedidos.db).
+# Em conta paga, rode com USAR_MYSQL=1 para gravar a senha do MySQL.
+if [ "$USAR_MYSQL" = "1" ] && [ ! -s ~/.agropedidos_senha ]; then
   read -r -s -p "Digite a senha do MySQL que você criou na aba Databases: " SENHA; echo
   printf '%s' "$SENHA" > ~/.agropedidos_senha
   chmod 600 ~/.agropedidos_senha
@@ -16,7 +20,7 @@ fi
 echo "== Instalando bibliotecas (pode levar 1-2 minutos) =="
 $PY -m pip install --user -q -r requirements.txt
 
-echo "== Criando tabelas e dados de exemplo no MySQL =="
+echo "== Criando tabelas e dados de exemplo =="
 $PY -c "
 import wsgi_pythonanywhere as w
 from app.comandos import popular_exemplo
@@ -27,7 +31,7 @@ with w.application.app_context():
 cat <<FIM
 
 == Pronto! Falta só criar o site na aba Web ==
-1) Aba "Web" > "Add a new web app" > Next > "Manual configuration" > "Python 3.10" > Next
+1) Aba "Web" > "Add a new web app" > Next > "Manual configuration" > "Python $VERSAO" > Next
 2) Clique no link do "WSGI configuration file", APAGUE tudo e cole estas 3 linhas:
 
 import sys, os
