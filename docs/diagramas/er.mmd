@@ -1,0 +1,74 @@
+erDiagram
+  CATEGORIA ||--o{ PRODUTO : "agrupa"
+  PRODUTO ||--o{ ITEM_PEDIDO : "aparece em"
+  PEDIDO ||--|{ ITEM_PEDIDO : "contém"
+  CLIENTE ||--o{ PEDIDO : "faz"
+  USUARIO ||--o{ PEDIDO : "lança"
+  PEDIDO ||--o{ HISTORICO_STATUS : "registra"
+  USUARIO ||--o{ HISTORICO_STATUS : "altera"
+  USUARIO {
+    INT id PK
+    VARCHAR nome
+    VARCHAR email UK
+    VARCHAR senha_hash
+    ENUM perfil
+    TINYINT ativo
+    DATETIME criado_em
+  }
+  CLIENTE {
+    INT id PK
+    VARCHAR nome
+    ENUM tipo_pessoa
+    VARCHAR cpf_cnpj UK
+    VARCHAR inscricao_estadual
+    VARCHAR propriedade
+    VARCHAR cidade
+    CHAR uf
+    VARCHAR telefone
+    VARCHAR email
+    TINYINT ativo
+    DATETIME criado_em
+  }
+  CATEGORIA {
+    INT id PK
+    VARCHAR nome UK
+  }
+  PRODUTO {
+    INT id PK
+    VARCHAR codigo UK
+    VARCHAR descricao
+    INT categoria_id FK
+    ENUM unidade
+    DECIMAL preco_unitario
+    TINYINT ativo
+  }
+  PEDIDO {
+    INT id PK
+    INT cliente_id FK
+    INT vendedor_id FK
+    DATE data_pedido
+    DATE data_prevista_entrega
+    ENUM status
+    DECIMAL valor_total
+    VARCHAR observacao
+    VARCHAR numero_nf UK
+    DATE data_faturamento
+    DATE data_entrega
+  }
+  ITEM_PEDIDO {
+    INT id PK
+    INT pedido_id FK
+    INT produto_id FK
+    DECIMAL quantidade
+    DECIMAL preco_unitario
+    DECIMAL subtotal
+  }
+  HISTORICO_STATUS {
+    INT id PK
+    INT pedido_id FK
+    INT usuario_id FK
+    VARCHAR status_anterior
+    VARCHAR status_novo
+    DATETIME data_hora
+    VARCHAR observacao
+  }

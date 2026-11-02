@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar pedido ' ~ pedido.numero if pedido.id else 'Novo pedido' }}{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>{{ 'Editar pedido ' ~ pedido.numero if pedido.id else 'Novo pedido de venda' }}</h1><p class="sub">O preço de cada item é o do cadastro do produto no momento do lançamento.</p></div></header>
+<form method="post" class="formulario" id="form-pedido" novalidate>
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <section class="cartao">
+    <h2>Dados do pedido</h2>
+    <div class="grade">
+      <label class="col-2">Cliente *<select name="cliente_id" required><option value="">Selecione o cliente</option>{% for c in clientes %}<option value="{{ c.id }}" {{ 'selected' if pedido.cliente_id == c.id }}>{{ c.nome }} — {{ c.cidade }}/{{ c.uf }}</option>{% endfor %}</select></label>
+      <label>Data do pedido *<input type="date" name="data_pedido" id="data_pedido" required value="{{ (pedido.data_pedido or hoje).isoformat() }}"></label>
+      <label>Previsão de entrega *<input type="date" name="data_prevista_entrega" id="data_prevista" required value="{{ pedido.data_prevista_entrega.isoformat() if pedido.data_prevista_entrega else '' }}"></label>
+      <label class="col-4">Observação<textarea name="observacao" rows="2" maxlength="500" placeholder="Condição de pagamento, local de entrega, safra...">{{ pedido.observacao or '' }}</textarea></label>
+    </div>
+  </section>
+
+  <section class="cartao">
+    <div class="titulo-secao"><h2>Itens</h2><button type="button" class="botao" id="adicionar-item">+ Adicionar item</button></div>
+    <div class="tabela-rolagem"><table class="itens">
+      <thead><tr><th>Produto</th><th class="num">Quantidade</th><th>Un.</th><th class="num">Preço unit.</th><th class="num">Subtotal</th><th></th></tr></thead>
+      <tbody id="linhas-itens">
+        {% set itens = pedido.itens if pedido.itens else [None] %}
+        {% for item in itens %}
+        <tr class="linha-item">
+          <td><select name="produto_id" class="produto"><option value="">Selecione</option>{% for p in produtos %}<option value="{{ p.id }}" {{ 'selected' if item and item.produto_id == p.id }}>{{ p.codigo }} · {{ p.descricao }}</option>{% endfor %}</select></td>
+          <td class="num"><input name="quantidade" class="quantidade" inputmode="decimal" value="{{ ('%g'|format(item.quantidade|float)) if item else '' }}" placeholder="0"></td>
+          <td class="unidade">—</td><td class="num preco">—</td><td class="num subtotal">—</td>
+          <td><button type="button" class="link remover" aria-label="Remover item">Remover</button></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot><tr><td colspan="4" class="num"><strong>Total do pedido</strong></td><td class="num"><strong id="total">R$ 0,00</strong></td><td></td></tr></tfoot>
+    </table></div>
+  </section>
+  <div class="botoes">
+    <a class="botao" href="{{ url_for('pedidos.detalhe', id=pedido.id) if pedido.id else url_for('pedidos.listar') }}">Cancelar</a>
+    <button class="botao primario" type="submit">Salvar pedido</button>
+  </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>iniciarFormularioPedido({{ catalogo_json|safe }});</script>
+{% endblock %}

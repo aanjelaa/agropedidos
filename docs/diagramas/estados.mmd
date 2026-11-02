@@ -1,0 +1,12 @@
+stateDiagram-v2
+  [*] --> PENDENTE : Vendedor lança o pedido
+  PENDENTE --> PENDENTE : editar itens/datas
+  PENDENTE --> FATURADO : Faturista informa nº da NF
+  PENDENTE --> CANCELADO : Vendedor/Admin informa motivo
+  FATURADO --> ENTREGUE : Faturista confirma entrega
+  ENTREGUE --> [*]
+  CANCELADO --> [*]
+  note right of PENDENTE
+    Atrasado = PENDENTE ou FATURADO
+    com previsão de entrega < hoje
+  end note

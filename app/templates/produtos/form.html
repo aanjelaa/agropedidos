@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if produto.id else 'Novo' }} produto{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>{{ 'Editar produto' if produto.id else 'Novo produto' }}</h1><p class="sub">Campos com * são obrigatórios</p></div></header>
+<form method="post" class="cartao formulario" novalidate>
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <div class="grade">
+    <label>Código *<input name="codigo" required maxlength="20" value="{{ produto.codigo or '' }}" placeholder="Ex.: SEM-010"></label>
+    <label class="col-2">Descrição *<input name="descricao" required maxlength="150" value="{{ produto.descricao or '' }}"></label>
+    <label>Categoria *<select name="categoria_id" required><option value="">Selecione</option>{% for c in categorias %}<option value="{{ c.id }}" {{ 'selected' if produto.categoria_id == c.id }}>{{ c.nome }}</option>{% endfor %}</select></label>
+    <label>Unidade *<select name="unidade" required><option value="">Selecione</option>{% for sigla, nome in unidades.items() %}<option value="{{ sigla }}" {{ 'selected' if produto.unidade == sigla }}>{{ sigla }} – {{ nome }}</option>{% endfor %}</select></label>
+    <label>Preço unitário (R$) *<input name="preco_unitario" required inputmode="decimal" value="{{ '%.2f'|format(produto.preco_unitario) if produto.preco_unitario else '' }}" placeholder="0,00"></label>
+  </div>
+  <div class="botoes">
+    <a class="botao" href="{{ url_for('produtos.listar') }}">Cancelar</a>
+    <button class="botao primario" type="submit">Salvar produto</button>
+  </div>
+</form>
+{% endblock %}

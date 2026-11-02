@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if cliente.id else 'Novo' }} cliente{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>{{ 'Editar cliente' if cliente.id else 'Novo cliente' }}</h1><p class="sub">Campos com * são obrigatórios</p></div></header>
+<form method="post" class="cartao formulario" novalidate>
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <div class="grade">
+    <label class="col-2">Nome / Razão social *<input name="nome" required minlength="3" maxlength="120" value="{{ cliente.nome or '' }}"></label>
+    <label>Tipo de pessoa *
+      <select name="tipo_pessoa" id="tipo_pessoa">
+        <option value="F" {{ 'selected' if cliente.tipo_pessoa == 'F' }}>Pessoa física (CPF)</option>
+        <option value="J" {{ 'selected' if cliente.tipo_pessoa == 'J' }}>Pessoa jurídica (CNPJ)</option>
+      </select></label>
+    <label><span><span id="rotulo_doc">CPF</span> *</span><input name="cpf_cnpj" id="cpf_cnpj" required value="{{ cliente.cpf_cnpj|documento if cliente.cpf_cnpj else '' }}" inputmode="numeric" data-mascara-doc></label>
+    <label>Inscrição estadual<input name="inscricao_estadual" maxlength="20" value="{{ cliente.inscricao_estadual or '' }}"></label>
+    <label class="col-2">Propriedade (fazenda/sítio)<input name="propriedade" maxlength="120" value="{{ cliente.propriedade or '' }}"></label>
+    <label>Cidade *<input name="cidade" required maxlength="80" value="{{ cliente.cidade or '' }}"></label>
+    <label>UF *<select name="uf" required><option value="">Selecione</option>{% for uf in ufs %}<option {{ 'selected' if cliente.uf == uf }}>{{ uf }}</option>{% endfor %}</select></label>
+    <label>Telefone<input name="telefone" maxlength="20" value="{{ cliente.telefone or '' }}" data-mascara-telefone inputmode="tel"></label>
+    <label class="col-2">E-mail<input type="email" name="email" maxlength="120" value="{{ cliente.email or '' }}"></label>
+  </div>
+  <div class="botoes">
+    <a class="botao" href="{{ url_for('clientes.listar') }}">Cancelar</a>
+    <button class="botao primario" type="submit">Salvar cliente</button>
+  </div>
+</form>
+{% endblock %}

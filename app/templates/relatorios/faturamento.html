@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block titulo %}Relatório de faturamento{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>Relatório de faturamento</h1><p class="sub">Pedidos faturados entre {{ inicio|data_br }} e {{ fim|data_br }}</p></div>
+  <a class="botao" href="{{ url_for('relatorios.faturamento_csv', inicio=inicio.isoformat(), fim=fim.isoformat()) }}">Exportar CSV (Excel)</a></header>
+<form class="filtros" method="get">
+  <label>De <input type="date" name="inicio" value="{{ inicio.isoformat() }}"></label>
+  <label>Até <input type="date" name="fim" value="{{ fim.isoformat() }}"></label>
+  <button class="botao" type="submit">Atualizar</button>
+</form>
+<section class="indicadores">
+  <div class="indicador"><span>Total faturado</span><strong class="valor">{{ total|moeda }}</strong></div>
+  <div class="indicador"><span>Notas emitidas</span><strong>{{ pedidos|length }}</strong></div>
+  <div class="indicador"><span>Ticket médio</span><strong class="valor">{{ (total / pedidos|length if pedidos else 0)|moeda }}</strong></div>
+</section>
+<div class="duas-colunas">
+  <section class="cartao"><h2>Por cliente</h2>
+    {% if por_cliente %}<table><thead><tr><th>Cliente</th><th class="num">Pedidos</th><th class="num">Valor</th></tr></thead><tbody>
+    {% for nome, qtd, valor in por_cliente %}<tr><td>{{ nome }}</td><td class="num">{{ qtd }}</td><td class="num">{{ valor|moeda }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="vazio">Sem faturamento no período.</p>{% endif %}</section>
+  <section class="cartao"><h2>Por categoria</h2>
+    {% if por_categoria %}<table><thead><tr><th>Categoria</th><th class="num">Valor</th><th class="num">%</th></tr></thead><tbody>
+    {% for nome, valor in por_categoria %}<tr><td>{{ nome }}</td><td class="num">{{ valor|moeda }}</td><td class="num">{{ (valor / total * 100)|numero(1) }}%</td></tr>{% endfor %}</tbody></table>
+    {% else %}<p class="vazio">Sem faturamento no período.</p>{% endif %}</section>
+</div>
+<section class="cartao"><h2>Notas do período</h2>
+  {% if pedidos %}<div class="tabela-rolagem"><table><thead><tr><th>Pedido</th><th>NF</th><th>Faturado em</th><th>Cliente</th><th>Status</th><th class="num">Valor</th></tr></thead><tbody>
+  {% for p in pedidos %}<tr><td><a href="{{ url_for('pedidos.detalhe', id=p.id) }}">{{ p.numero }}</a></td><td>{{ p.numero_nf }}</td><td>{{ p.data_faturamento|data_br }}</td><td>{{ p.cliente.nome }}</td><td><span class="selo selo-{{ p.status|lower }}">{{ p.status_nome }}</span></td><td class="num">{{ p.valor_total|moeda }}</td></tr>{% endfor %}
+  </tbody></table></div>{% else %}<p class="vazio">Nenhuma nota no período.</p>{% endif %}
+</section>
+{% endblock %}

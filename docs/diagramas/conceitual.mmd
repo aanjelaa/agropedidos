@@ -1,0 +1,21 @@
+flowchart LR
+  CLI[CLIENTE]:::ent
+  PED[PEDIDO]:::ent
+  USU[USUÁRIO]:::ent
+  PRO[PRODUTO]:::ent
+  CAT[CATEGORIA]:::ent
+  HIS[HISTÓRICO DE STATUS]:::ent
+  R1{faz}:::rel
+  R2{lança}:::rel
+  R3{contém<br/>quantidade, preço,<br/>subtotal}:::rel
+  R4{pertence}:::rel
+  R5{registra}:::rel
+  R6{altera}:::rel
+  CLI ---|1| R1 ---|N| PED
+  USU ---|1| R2 ---|N| PED
+  PED ---|N| R3 ---|N| PRO
+  PRO ---|N| R4 ---|1| CAT
+  PED ---|1| R5 ---|N| HIS
+  USU ---|1| R6 ---|N| HIS
+  classDef ent fill:#e7f1e8,stroke:#2f6b3a,stroke-width:2px,color:#1f2a22,font-weight:bold
+  classDef rel fill:#fff4d6,stroke:#9a6700,color:#1f2a22

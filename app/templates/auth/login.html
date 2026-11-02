@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block publico %}
+<div class="tela-login">
+  <form method="post" class="cartao-login">
+    <div class="marca grande"><span class="logo">AP</span><div><strong>AgroPedidos</strong><small>Controle de pedidos e faturamento de insumos agrícolas</small></div></div>
+    {% include "_mensagens.html" %}
+    <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+    <label>E-mail<input type="email" name="email" required autofocus value="{{ request.form.email or '' }}"></label>
+    <label>Senha<input type="password" name="senha" required></label>
+    <button class="botao primario largo" type="submit">Entrar</button>
+    <p class="dica">Usuários de demonstração: <b>admin@agropedidos.com</b> / admin123 · <b>vendedor@agropedidos.com</b> / vendedor123 · <b>faturista@agropedidos.com</b> / faturista123</p>
+  </form>
+</div>
+{% endblock %}

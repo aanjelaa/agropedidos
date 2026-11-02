@@ -1,0 +1,93 @@
+classDiagram
+direction LR
+class Usuario {
+  -int id
+  -string nome
+  -string email
+  -string senhaHash
+  -Perfil perfil
+  -bool ativo
+  +definirSenha(senha)
+  +conferirSenha(senha) bool
+  +pode(acao) bool
+}
+class Cliente {
+  -int id
+  -string nome
+  -char tipoPessoa
+  -string cpfCnpj
+  -string inscricaoEstadual
+  -string propriedade
+  -string cidade
+  -string uf
+  -string telefone
+  -string email
+  -bool ativo
+  +preencher(dados) List~string~
+}
+class Categoria {
+  -int id
+  -string nome
+}
+class Produto {
+  -int id
+  -string codigo
+  -string descricao
+  -Unidade unidade
+  -decimal precoUnitario
+  -bool ativo
+  +preencher(dados) List~string~
+}
+class Pedido {
+  -int id
+  -date dataPedido
+  -date dataPrevistaEntrega
+  -StatusPedido status
+  -decimal valorTotal
+  -string observacao
+  -string numeroNF
+  -date dataFaturamento
+  -date dataEntrega
+  +numero() string
+  +atrasado() bool
+  +diasAtraso() int
+  +editavel() bool
+  +preencher(dados, itens) List~string~
+  +recalcularTotal()
+  +alterarStatus(novo, usuario, nf, obs)
+}
+class ItemPedido {
+  -int id
+  -decimal quantidade
+  -decimal precoUnitario
+  -decimal subtotal
+}
+class HistoricoStatus {
+  -int id
+  -string statusAnterior
+  -string statusNovo
+  -datetime dataHora
+  -string observacao
+}
+class StatusPedido {
+  <<enumeration>>
+  PENDENTE
+  FATURADO
+  ENTREGUE
+  CANCELADO
+}
+class Perfil {
+  <<enumeration>>
+  ADMIN
+  VENDEDOR
+  FATURISTA
+}
+Cliente "1" --> "0..*" Pedido : faz
+Usuario "1" --> "0..*" Pedido : lança
+Pedido "1" *-- "1..*" ItemPedido : contém
+Produto "1" <-- "0..*" ItemPedido : refere-se
+Categoria "1" o-- "0..*" Produto : agrupa
+Pedido "1" *-- "0..*" HistoricoStatus : registra
+Usuario "1" <-- "0..*" HistoricoStatus : responsável
+Pedido ..> StatusPedido
+Usuario ..> Perfil

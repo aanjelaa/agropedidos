@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block titulo %}Usuários{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>Usuários</h1><p class="sub">Quem acessa o sistema e o que cada perfil pode fazer</p></div><a class="botao primario" href="{{ url_for('usuarios.formulario') }}">+ Novo usuário</a></header>
+<section class="cartao"><div class="tabela-rolagem"><table>
+  <thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Situação</th><th></th></tr></thead>
+  <tbody>{% for u in usuarios %}
+    <tr class="{{ 'inativo' if not u.ativo }}"><td>{{ u.nome }}</td><td>{{ u.email }}</td><td>{{ u.perfil_nome }}</td>
+      <td><span class="selo {{ 'selo-entregue' if u.ativo else 'selo-cancelado' }}">{{ 'Ativo' if u.ativo else 'Inativo' }}</span></td>
+      <td class="acoes"><a href="{{ url_for('usuarios.formulario', id=u.id) }}">Editar</a>
+        {% if u.id != current_user.id %}<form method="post" action="{{ url_for('usuarios.alternar', id=u.id) }}" data-confirmar="{{ 'Inativar' if u.ativo else 'Reativar' }} {{ u.nome }}?"><input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="link" type="submit">{{ 'Inativar' if u.ativo else 'Reativar' }}</button></form>{% endif %}</td></tr>
+  {% endfor %}</tbody>
+</table></div></section>
+<section class="cartao"><h2>Permissões por perfil</h2>
+<div class="tabela-rolagem"><table class="matriz"><thead><tr><th>Ação</th><th>Administrador</th><th>Vendedor</th><th>Faturista</th></tr></thead><tbody>
+<tr><td>Consultar painel, pedidos, clientes, produtos e relatório</td><td>✔</td><td>✔</td><td>✔</td></tr>
+<tr><td>Cadastrar/editar clientes</td><td>✔</td><td>✔</td><td>—</td></tr>
+<tr><td>Cadastrar/editar produtos</td><td>✔</td><td>—</td><td>—</td></tr>
+<tr><td>Lançar, editar e cancelar pedidos pendentes</td><td>✔</td><td>✔</td><td>—</td></tr>
+<tr><td>Faturar pedido e confirmar entrega</td><td>✔</td><td>—</td><td>✔</td></tr>
+<tr><td>Gerenciar usuários</td><td>✔</td><td>—</td><td>—</td></tr>
+</tbody></table></div></section>
+{% endblock %}

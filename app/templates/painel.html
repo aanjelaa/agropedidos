@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block titulo %}Painel{% endblock %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Painel</h1><p class="sub">Situação dos pedidos em {{ hoje|data_br }}</p></div>
+  {% if current_user.pode('criar_pedido') %}<a class="botao primario" href="{{ url_for('pedidos.formulario') }}">+ Novo pedido</a>{% endif %}
+</header>
+
+<section class="indicadores">
+  <a class="indicador" href="{{ url_for('pedidos.listar', status='PENDENTE') }}"><span>Pendentes de faturamento</span><strong>{{ contagem.get('PENDENTE', 0) }}</strong><small>{{ carteira_pendente|moeda }} em carteira</small></a>
+  <a class="indicador" href="{{ url_for('pedidos.listar', status='FATURADO') }}"><span>Faturados (a entregar)</span><strong>{{ contagem.get('FATURADO', 0) }}</strong><small>aguardando entrega</small></a>
+  <a class="indicador" href="{{ url_for('pedidos.listar', status='ENTREGUE') }}"><span>Entregues</span><strong>{{ contagem.get('ENTREGUE', 0) }}</strong><small>concluídos</small></a>
+  <a class="indicador destaque-erro" href="{{ url_for('pedidos.listar', atrasados=1) }}"><span>Atrasados</span><strong>{{ atrasados|length }}</strong><small>{{ vencem_hoje }} vencem hoje</small></a>
+  <div class="indicador"><span>Faturado no mês</span><strong class="valor">{{ faturado_mes|moeda }}</strong><small>desde {{ hoje.replace(day=1)|data_br }}</small></div>
+</section>
+
+<section class="cartao">
+  <h2>Pedidos atrasados</h2>
+  <p class="sub">Pedidos pendentes ou faturados cuja data prevista de entrega já passou.</p>
+  {% if atrasados %}
+  <div class="tabela-rolagem"><table>
+    <thead><tr><th>Pedido</th><th>Cliente</th><th>Status</th><th>Previsto</th><th class="num">Dias de atraso</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+    {% for p in atrasados %}
+      <tr>
+        <td><a href="{{ url_for('pedidos.detalhe', id=p.id) }}">{{ p.numero }}</a></td>
+        <td>{{ p.cliente.nome }}</td>
+        <td><span class="selo selo-{{ p.status|lower }}">{{ p.status_nome }}</span></td>
+        <td>{{ p.data_prevista_entrega|data_br }}</td>
+        <td class="num"><span class="selo selo-atraso">{{ p.dias_atraso }} dia{{ 's' if p.dias_atraso > 1 }}</span></td>
+        <td class="num">{{ p.valor_total|moeda }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}
+  <p class="vazio">Nenhum pedido atrasado. 🎉</p>
+  {% endif %}
+</section>
+{% endblock %}

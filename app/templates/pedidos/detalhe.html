@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block titulo %}Pedido {{ pedido.numero }}{% endblock %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Pedido {{ pedido.numero }} <span class="selo selo-{{ pedido.status|lower }}">{{ pedido.status_nome }}</span>{% if pedido.atrasado %} <span class="selo selo-atraso">Atrasado {{ pedido.dias_atraso }} dia(s)</span>{% endif %}</h1>
+  <p class="sub">Lançado por {{ pedido.vendedor.nome }} em {{ pedido.data_pedido|data_br }}</p></div>
+  <div class="botoes-topo">
+    {% if pedido.editavel and current_user.pode('criar_pedido') %}<a class="botao" href="{{ url_for('pedidos.formulario', id=pedido.id) }}">Editar</a>{% endif %}
+    <button class="botao" type="button" onclick="window.print()">Imprimir</button>
+  </div>
+</header>
+
+<div class="duas-colunas">
+  <section class="cartao">
+    <h2>Cliente</h2>
+    <dl class="dados">
+      <dt>Nome</dt><dd>{{ pedido.cliente.nome }}</dd>
+      <dt>CPF/CNPJ</dt><dd class="mono">{{ pedido.cliente.cpf_cnpj|documento }}</dd>
+      <dt>Propriedade</dt><dd>{{ pedido.cliente.propriedade or '—' }}</dd>
+      <dt>Cidade/UF</dt><dd>{{ pedido.cliente.cidade }}/{{ pedido.cliente.uf }}</dd>
+    </dl>
+  </section>
+  <section class="cartao">
+    <h2>Faturamento e entrega</h2>
+    <dl class="dados">
+      <dt>Previsão de entrega</dt><dd>{{ pedido.data_prevista_entrega|data_br }}</dd>
+      <dt>Nota fiscal</dt><dd>{{ pedido.numero_nf or '—' }}</dd>
+      <dt>Faturado em</dt><dd>{{ pedido.data_faturamento|data_br }}</dd>
+      <dt>Entregue em</dt><dd>{{ pedido.data_entrega|data_br }}</dd>
+    </dl>
+  </section>
+</div>
+
+<section class="cartao">
+  <h2>Itens</h2>
+  <div class="tabela-rolagem"><table>
+    <thead><tr><th>Código</th><th>Produto</th><th class="num">Quantidade</th><th>Un.</th><th class="num">Preço unit.</th><th class="num">Subtotal</th></tr></thead>
+    <tbody>{% for i in pedido.itens %}<tr><td class="mono">{{ i.produto.codigo }}</td><td>{{ i.produto.descricao }}</td><td class="num">{{ i.quantidade|numero(3) }}</td><td>{{ i.produto.unidade }}</td><td class="num">{{ i.preco_unitario|moeda }}</td><td class="num">{{ i.subtotal|moeda }}</td></tr>{% endfor %}</tbody>
+    <tfoot><tr><td colspan="5" class="num"><strong>Total</strong></td><td class="num"><strong>{{ pedido.valor_total|moeda }}</strong></td></tr></tfoot>
+  </table></div>
+  {% if pedido.observacao %}<p class="obs"><b>Observação:</b> {{ pedido.observacao }}</p>{% endif %}
+</section>
+
+{% set acoes = [] %}
+{% if pedido.status == 'PENDENTE' and current_user.pode('faturar_pedido') %}{% set _ = acoes.append('FATURADO') %}{% endif %}
+{% if pedido.status == 'FATURADO' and current_user.pode('entregar_pedido') %}{% set _ = acoes.append('ENTREGUE') %}{% endif %}
+{% if pedido.status == 'PENDENTE' and current_user.pode('cancelar_pedido') %}{% set _ = acoes.append('CANCELADO') %}{% endif %}
+{% if acoes %}
+<section class="cartao nao-imprimir">
+  <h2>Próxima etapa</h2>
+  <div class="acoes-status">
+    {% if 'FATURADO' in acoes %}
+    <form method="post" action="{{ url_for('pedidos.alterar_status', id=pedido.id) }}" class="acao">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="novo_status" value="FATURADO">
+      <label>Número da NF *<input name="numero_nf" required maxlength="20" placeholder="Ex.: 1520"></label>
+      <button class="botao primario" type="submit">Faturar pedido</button>
+    </form>
+    {% endif %}
+    {% if 'ENTREGUE' in acoes %}
+    <form method="post" action="{{ url_for('pedidos.alterar_status', id=pedido.id) }}" class="acao" data-confirmar="Confirmar a entrega do pedido {{ pedido.numero }}?">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="novo_status" value="ENTREGUE">
+      <label>Observação da entrega<input name="observacao" maxlength="255" placeholder="Opcional"></label>
+      <button class="botao primario" type="submit">Confirmar entrega</button>
+    </form>
+    {% endif %}
+    {% if 'CANCELADO' in acoes %}
+    <form method="post" action="{{ url_for('pedidos.alterar_status', id=pedido.id) }}" class="acao" data-confirmar="Cancelar o pedido {{ pedido.numero }}? Esta ação não pode ser desfeita.">
+      <input type="hidden" name="_csrf" value="{{ csrf_token() }}"><input type="hidden" name="novo_status" value="CANCELADO">
+      <label>Motivo do cancelamento *<input name="observacao" required maxlength="255"></label>
+      <button class="botao perigo" type="submit">Cancelar pedido</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="cartao">
+  <h2>Histórico</h2>
+  <ol class="linha-tempo">
+    <li><b>Pedido lançado</b> por {{ pedido.vendedor.nome }} · {{ pedido.data_pedido|data_br }}</li>
+    {% for h in pedido.historico %}
+    <li><b>{{ h.status_anterior|title }} → {{ h.status_novo|title }}</b> por {{ h.usuario.nome }} · {{ h.data_hora|data_hora_br }}{% if h.observacao %}<br><small>{{ h.observacao }}</small>{% endif %}</li>
+    {% endfor %}
+  </ol>
+</section>
+{% endblock %}

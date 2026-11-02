@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block titulo %}Produtos{% endblock %}
+{% block conteudo %}
+<header class="cabecalho">
+  <div><h1>Produtos</h1><p class="sub">Sementes, defensivos e fertilizantes</p></div>
+  {% if current_user.pode('gerir_produtos') %}<a class="botao primario" href="{{ url_for('produtos.formulario') }}">+ Novo produto</a>{% endif %}
+</header>
+<form class="filtros" method="get">
+  <input type="search" name="busca" value="{{ busca }}" placeholder="Buscar por código ou descrição">
+  <select name="categoria"><option value="">Todas as categorias</option>{% for c in categorias %}<option value="{{ c.id }}" {{ 'selected' if categoria_id == c.id }}>{{ c.nome }}</option>{% endfor %}</select>
+  <label class="check"><input type="checkbox" name="inativos" value="1" {{ 'checked' if mostrar_inativos }}> Mostrar inativos</label>
+  <button class="botao" type="submit">Filtrar</button>
+</form>
+<section class="cartao">
+  {% if pagina.items %}
+  <div class="tabela-rolagem"><table>
+    <thead><tr><th>Código</th><th>Descrição</th><th>Categoria</th><th>Unidade</th><th class="num">Preço</th><th>Situação</th><th></th></tr></thead>
+    <tbody>
+    {% for p in pagina.items %}
+      <tr class="{{ 'inativo' if not p.ativo }}">
+        <td class="mono">{{ p.codigo }}</td><td>{{ p.descricao }}</td><td>{{ p.categoria.nome }}</td><td>{{ p.unidade }}</td>
+        <td class="num">{{ p.preco_unitario|moeda }}</td>
+        <td><span class="selo {{ 'selo-entregue' if p.ativo else 'selo-cancelado' }}">{{ 'Ativo' if p.ativo else 'Inativo' }}</span></td>
+        <td class="acoes">{% if current_user.pode('gerir_produtos') %}
+          <a href="{{ url_for('produtos.formulario', id=p.id) }}">Editar</a>
+          <form method="post" action="{{ url_for('produtos.alternar', id=p.id) }}" data-confirmar="{{ 'Inativar' if p.ativo else 'Reativar' }} o produto {{ p.codigo }}?">
+            <input type="hidden" name="_csrf" value="{{ csrf_token() }}"><button class="link" type="submit">{{ 'Inativar' if p.ativo else 'Reativar' }}</button>
+          </form>{% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% include "_paginacao.html" %}
+  {% else %}<p class="vazio">Nenhum produto encontrado.</p>{% endif %}
+</section>
+{% endblock %}

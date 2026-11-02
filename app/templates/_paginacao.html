@@ -1,0 +1,8 @@
+{% if pagina.pages > 1 %}
+<nav class="paginacao">
+  {% set args = request.args.to_dict() %}
+  {% if pagina.has_prev %}{% set _ = args.update(pagina=pagina.prev_num) %}<a href="?{{ args|urlencode }}">‹ Anterior</a>{% endif %}
+  <span>Página {{ pagina.page }} de {{ pagina.pages }} ({{ pagina.total }} registros)</span>
+  {% if pagina.has_next %}{% set _ = args.update(pagina=pagina.next_num) %}<a href="?{{ args|urlencode }}">Próxima ›</a>{% endif %}
+</nav>
+{% endif %}

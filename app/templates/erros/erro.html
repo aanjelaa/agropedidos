@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}Erro {{ codigo }}{% endblock %}
+{% macro corpo() %}
+<div class="cartao erro-pagina"><h1>Erro {{ codigo }}</h1><p>{{ mensagem }}</p><a class="botao" href="{{ url_for('painel.inicio') }}">Voltar ao painel</a></div>
+{% endmacro %}
+{% block conteudo %}{{ corpo() }}{% endblock %}
+{% block publico %}<div class="tela-login">{{ corpo() }}</div>{% endblock %}

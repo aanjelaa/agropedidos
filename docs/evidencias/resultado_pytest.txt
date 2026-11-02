@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.18, pytest-9.1.1, pluggy-1.6.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+rootdir: agropedidos
+configfile: pytest.ini
+testpaths: tests
+plugins: platformdirs-4.13.3, anyio-4.15.1
+collecting ... collected 31 items
+
+tests/test_regras_pedido.py::test_total_calculado_pelos_itens PASSED     [  3%]
+tests/test_regras_pedido.py::test_pedido_sem_itens_nao_salva PASSED      [  6%]
+tests/test_regras_pedido.py::test_quantidade_zero_rejeitada PASSED       [  9%]
+tests/test_regras_pedido.py::test_previsao_anterior_ao_pedido_rejeitada PASSED [ 12%]
+tests/test_regras_pedido.py::test_preco_congelado_no_lancamento PASSED   [ 16%]
+tests/test_regras_pedido.py::test_fluxo_completo_de_status PASSED        [ 19%]
+tests/test_regras_pedido.py::test_faturar_exige_nf PASSED                [ 22%]
+tests/test_regras_pedido.py::test_nf_nao_pode_repetir PASSED             [ 25%]
+tests/test_regras_pedido.py::test_nao_pula_etapa PASSED                  [ 29%]
+tests/test_regras_pedido.py::test_vendedor_nao_fatura PASSED             [ 32%]
+tests/test_regras_pedido.py::test_cancelamento_exige_motivo PASSED       [ 35%]
+tests/test_regras_pedido.py::test_pedido_faturado_nao_pode_ser_editado PASSED [ 38%]
+tests/test_regras_pedido.py::test_regra_de_atraso PASSED                 [ 41%]
+tests/test_regras_pedido.py::test_cliente_documento_duplicado PASSED     [ 45%]
+tests/test_telas.py::test_login_invalido PASSED                          [ 48%]
+tests/test_telas.py::test_pagina_exige_login PASSED                      [ 51%]
+tests/test_telas.py::test_painel_mostra_atrasados PASSED                 [ 54%]
+tests/test_telas.py::test_cadastrar_cliente_pela_tela PASSED             [ 58%]
+tests/test_telas.py::test_cliente_cpf_invalido_pela_tela PASSED          [ 61%]
+tests/test_telas.py::test_lancar_pedido_pela_tela PASSED                 [ 64%]
+tests/test_telas.py::test_faturista_fatura_pela_tela PASSED              [ 67%]
+tests/test_telas.py::test_faturista_nao_cadastra_produto PASSED          [ 70%]
+tests/test_telas.py::test_vendedor_nao_acessa_usuarios PASSED            [ 74%]
+tests/test_telas.py::test_relatorio_csv PASSED                           [ 77%]
+tests/test_validadores.py::test_cpf_valido PASSED                        [ 80%]
+tests/test_validadores.py::test_cpf_invalido_digito PASSED               [ 83%]
+tests/test_validadores.py::test_cpf_repetido_invalido PASSED             [ 87%]
+tests/test_validadores.py::test_cnpj_valido PASSED                       [ 90%]
+tests/test_validadores.py::test_cnpj_invalido PASSED                     [ 93%]
+tests/test_validadores.py::test_formatacao_moeda_brasileira PASSED       [ 96%]
+tests/test_validadores.py::test_formatacao_documento PASSED              [100%]
+
+============================== 31 passed in 7.92s ==============================

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}AgroPedidos{% endblock %} · AgroPedidos</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+</head>
+<body>
+{% if current_user.is_authenticated %}
+<div class="layout">
+  <aside class="menu" id="menu">
+    <div class="marca"><span class="logo">AP</span><div><strong>AgroPedidos</strong><small>Pedidos e Faturamento</small></div></div>
+    <nav>
+      {% set ep = request.endpoint or '' %}
+      <a href="{{ url_for('painel.inicio') }}" class="{{ 'ativo' if ep.startswith('painel') }}">Painel</a>
+      <a href="{{ url_for('pedidos.listar') }}" class="{{ 'ativo' if ep.startswith('pedidos') }}">Pedidos</a>
+      <a href="{{ url_for('clientes.listar') }}" class="{{ 'ativo' if ep.startswith('clientes') }}">Clientes</a>
+      <a href="{{ url_for('produtos.listar') }}" class="{{ 'ativo' if ep.startswith('produtos') }}">Produtos</a>
+      <a href="{{ url_for('relatorios.faturamento') }}" class="{{ 'ativo' if ep.startswith('relatorios') }}">Relatório de faturamento</a>
+      {% if current_user.pode('gerir_usuarios') %}
+      <a href="{{ url_for('usuarios.listar') }}" class="{{ 'ativo' if ep.startswith('usuarios') }}">Usuários</a>
+      {% endif %}
+    </nav>
+    <div class="usuario-logado">
+      <span>{{ current_user.nome }}</span>
+      <small>{{ current_user.perfil_nome }}</small>
+      <a href="{{ url_for('auth.logout') }}">Sair</a>
+    </div>
+  </aside>
+  <main class="conteudo">
+    <button class="botao-menu" type="button" onclick="document.getElementById('menu').classList.toggle('aberto')" aria-label="Abrir menu">☰ Menu</button>
+    {% include "_mensagens.html" %}
+    {% block conteudo %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% block publico %}{% endblock %}
+{% endif %}
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

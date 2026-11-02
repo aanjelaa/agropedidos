@@ -1,0 +1,12 @@
+flowchart LR
+  N[Navegador<br/>HTML + CSS + JavaScript] -- requisição HTTP --> C
+  subgraph Servidor Flask - Python
+    C[CONTROLLER<br/>app/controllers<br/>auth, painel, clientes,<br/>produtos, pedidos,<br/>usuarios, relatorios]
+    M[MODEL<br/>app/models<br/>entidades + regras<br/>de negócio]
+    V[VIEW<br/>app/templates<br/>Jinja2 + static]
+    C -- chama --> M
+    M -- dados --> C
+    C -- envia dados --> V
+  end
+  M -- SQLAlchemy ORM --> DB[(MySQL<br/>agropedidos)]
+  V -- página HTML --> N

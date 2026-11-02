@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if editando else 'Novo' }} usuário{% endblock %}
+{% block conteudo %}
+<header class="cabecalho"><div><h1>{{ 'Editar usuário' if editando else 'Novo usuário' }}</h1></div></header>
+<form method="post" class="cartao formulario" novalidate>
+  <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+  <div class="grade">
+    <label class="col-2">Nome *<input name="nome" required value="{{ usuario.nome or '' }}"></label>
+    <label class="col-2">E-mail *<input type="email" name="email" required value="{{ usuario.email or '' }}"></label>
+    <label>Perfil *<select name="perfil">{% for k, v in usuario.PERFIS.items() %}<option value="{{ k }}" {{ 'selected' if usuario.perfil == k }}>{{ v }}</option>{% endfor %}</select></label>
+    <label>Senha {{ '(deixe em branco para manter)' if editando else '*' }}<input type="password" name="senha" minlength="6" autocomplete="new-password"></label>
+  </div>
+  <div class="botoes"><a class="botao" href="{{ url_for('usuarios.listar') }}">Cancelar</a><button class="botao primario" type="submit">Salvar usuário</button></div>
+</form>
+{% endblock %}
