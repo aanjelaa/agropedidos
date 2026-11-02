@@ -88,22 +88,23 @@ O resultado da última execução está em `docs/evidencias/resultado_pytest.txt
 
 ## Publicar no PythonAnywhere (gratuito)
 
-1. Crie uma conta gratuita em https://www.pythonanywhere.com.
-2. Na aba **Databases**, defina uma senha do MySQL e crie o banco `agropedidos` (o nome fica `seuusuario$agropedidos`).
-3. Abra um **Bash console** e rode:
+1. Crie uma conta gratuita (Beginner) em https://www.pythonanywhere.com.
+2. Na aba **Databases**, crie uma senha do MySQL (clique em *Initialize MySQL*).
+3. Na aba **Consoles**, abra um **Bash** e cole:
    ```bash
-   git clone https://github.com/SEU-USUARIO/agropedidos.git
-   cd agropedidos
-   pip install --user -r requirements.txt
+   git clone https://github.com/aanjelaa/agropedidos.git && bash agropedidos/pythonanywhere_setup.sh
    ```
-4. Na aba **Web**, clique em *Add a new web app* → *Manual configuration* → Python 3.10 (ou mais novo).
-5. Abra o arquivo **WSGI configuration file**, apague o conteúdo e cole o de `wsgi_pythonanywhere.py`, trocando usuário e senha.
-6. No console, crie as tabelas e os dados de exemplo com as mesmas variáveis:
-   ```bash
-   export DATABASE_URL='mysql+pymysql://seuusuario:SENHA@seuusuario.mysql.pythonanywhere-services.com/seuusuario$agropedidos?charset=utf8mb4'
-   flask --app run seed
+   O script pede a senha do MySQL, instala as bibliotecas e cria as tabelas com dados de exemplo.
+4. Na aba **Web**: *Add a new web app* → *Manual configuration* → *Python 3.10*.
+5. Abra o **WSGI configuration file**, apague tudo, cole as linhas abaixo e salve:
+   ```python
+   import sys, os
+   sys.path.insert(0, os.path.expanduser('~/agropedidos'))
+   from wsgi_pythonanywhere import application
    ```
-7. Clique em **Reload** na aba Web. O sistema fica em `https://seuusuario.pythonanywhere.com`.
+6. Clique em **Reload**. O sistema fica em `https://SEU-USUARIO.pythonanywhere.com`.
+
+Para atualizar depois de mudanças no GitHub: `cd ~/agropedidos && git pull` e **Reload** na aba Web.
 
 ---
 

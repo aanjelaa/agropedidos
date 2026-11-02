@@ -1,19 +1,29 @@
-# Copie este conteúdo para o arquivo WSGI do PythonAnywhere
-# (aba Web > "WSGI configuration file") e ajuste USUARIO e SENHA.
+"""Configuração para rodar o AgroPedidos no PythonAnywhere.
+
+Não é preciso editar este arquivo: o usuário é detectado sozinho e a senha
+do MySQL é lida do arquivo ~/.agropedidos_senha (criado pelo
+pythonanywhere_setup.sh).
+"""
+import getpass
 import os
 import sys
 
-USUARIO = "seuusuario"           # seu usuário do PythonAnywhere
-SENHA_MYSQL = "sua-senha-mysql"  # definida na aba Databases
+PROJETO = os.path.dirname(os.path.abspath(__file__))
+if PROJETO not in sys.path:
+    sys.path.insert(0, PROJETO)
 
-projeto = f"/home/{USUARIO}/agropedidos"
-if projeto not in sys.path:
-    sys.path.insert(0, projeto)
+USUARIO = getpass.getuser()
+ARQ_SENHA = os.path.expanduser("~/.agropedidos_senha")
+ARQ_CHAVE = os.path.expanduser("~/.agropedidos_chave")
 
-os.environ["SECRET_KEY"] = "troque-por-um-texto-longo-e-aleatorio"
-os.environ["DATABASE_URL"] = (
-    f"mysql+pymysql://{USUARIO}:{SENHA_MYSQL}"
-    f"@{USUARIO}.mysql.pythonanywhere-services.com/{USUARIO}$agropedidos?charset=utf8mb4"
-)
+if "DATABASE_URL" not in os.environ and os.path.exists(ARQ_SENHA):
+    from urllib.parse import quote_plus
+    senha = open(ARQ_SENHA, encoding="utf-8").read().strip()
+    os.environ["DATABASE_URL"] = (
+        f"mysql+pymysql://{USUARIO}:{quote_plus(senha)}"
+        f"@{USUARIO}.mysql.pythonanywhere-services.com/{USUARIO}$default?charset=utf8mb4"
+    )
+if "SECRET_KEY" not in os.environ and os.path.exists(ARQ_CHAVE):
+    os.environ["SECRET_KEY"] = open(ARQ_CHAVE, encoding="utf-8").read().strip()
 
 from run import app as application  # noqa: E402
